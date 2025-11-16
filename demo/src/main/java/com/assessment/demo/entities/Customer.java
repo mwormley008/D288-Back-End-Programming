@@ -2,6 +2,7 @@ package com.assessment.demo.entities;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -9,7 +10,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-@Data // includes getters, setters, equals, hashCode, toString
+@Data
+@NoArgsConstructor // Required by JPA
 @Entity
 @Table(name = "customers")
 public class Customer {
@@ -29,7 +31,7 @@ public class Customer {
     private String address;
 
     @Column(name = "postal_code", nullable = false)
-    private String postal_code; // underscore to match DB + frontend DTO
+    private String postal_code;
 
     @Column(name = "phone", nullable = false)
     private String phone;
@@ -48,6 +50,16 @@ public class Customer {
 
     @OneToMany(mappedBy = "customer", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private Set<Cart> carts = new HashSet<>();
+
+    // Custom constructor for Bootstrap
+    public Customer(String firstName, String lastName, String address, String postal_code, String phone, Division division) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.address = address;
+        this.postal_code = postal_code;
+        this.phone = phone;
+        this.division = division;
+    }
 
     public void add(Cart cart) {
         if (cart != null) {
