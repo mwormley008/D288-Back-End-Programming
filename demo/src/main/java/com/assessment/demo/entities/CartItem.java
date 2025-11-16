@@ -18,10 +18,10 @@ public class CartItem {
     @Column(name = "cart_item_id")
     private Long id;
 
-//    // Many cart items belong to one excursion
-//    @ManyToOne
-//    @JoinColumn(name = "excursion_id", nullable = false)
-//    private Excursion excursion;
+    // Many cart items belong to one vacation
+    @ManyToOne
+    @JoinColumn(name = "vacation_id", nullable = false)
+    private Vacation vacation;
 
     // Many cart items belong to one cart
     @ManyToOne

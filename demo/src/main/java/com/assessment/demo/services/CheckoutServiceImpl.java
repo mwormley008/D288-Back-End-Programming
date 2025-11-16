@@ -1,6 +1,5 @@
 package com.assessment.demo.services;
 
-import com.assessment.demo.dao.CartItemRepository;
 import com.assessment.demo.dao.CartRepository;
 import com.assessment.demo.dao.CustomerRepository;
 import com.assessment.demo.entities.Cart;
@@ -18,54 +17,49 @@ public class CheckoutServiceImpl implements CheckoutService {
 
     private final CustomerRepository customerRepository;
     private final CartRepository cartRepository;
-    private final CartItemRepository cartItemRepository;
 
     public CheckoutServiceImpl(CustomerRepository customerRepository,
-                               CartRepository cartRepository,
-                               CartItemRepository cartItemRepository) {
+                               CartRepository cartRepository) {
         this.customerRepository = customerRepository;
         this.cartRepository = cartRepository;
-        this.cartItemRepository = cartItemRepository;
     }
 
     @Override
     @Transactional
     public PurchaseResponse placeOrder(Purchase purchase) {
 
-        // get the cart data from the purchase object
-        Cart cart = purchase.getCart();
+        // Get cart items from purchase object
+        Set<CartItem> purchaseItems = purchase.getCartItems();
 
-        // validation: make sure cart exists and has at least one item
-        if (cart == null || cart.getCartItems() == null || cart.getCartItems().isEmpty()) {
-            return new PurchaseResponse("Cart is empty. Please add items before checking out.");
+        // Check if cart is empty or null
+        if (purchaseItems == null || purchaseItems.isEmpty()) {
+            return new PurchaseResponse("ERROR: There are no vacations in your cart. Please add at least one item before checking out.");
         }
 
-        // generate an order tracking number
+        // Create a new cart instance (ignore incoming cart from Purchase)
+        Cart newCart = new Cart();
+        newCart.setStatus(StatusType.ordered);
+
+        // Generate tracking number
         String orderTrackingNumber = generateOrderTrackingNumber();
-        cart.setOrderTrackingNumber(orderTrackingNumber);
+        newCart.setOrderTrackingNumber(orderTrackingNumber);
 
-        // connect each cart item to the cart
-        Set<CartItem> cartItems = purchase.getCartItems();
-        cartItems.forEach(item -> item.setCart(cart));
-        cartItems.forEach(cart::add);
+        // Attach items to the new cart
+        for (CartItem item : purchaseItems) {
+            newCart.add(item);
+        }
 
-        // update the cart status and save it to the db
-        cart.setStatus(StatusType.ordered);
-        cartRepository.save(cart);
-
-        // attach the cart to the customer
+        // Associate the cart to the customer
         Customer customer = purchase.getCustomer();
-        customer.add(cart);
+        customer.add(newCart);
 
-        // sometimes this line can prevent the tracking number from showing in the UI
-        // customerRepository.save(customer);
+        // Save the customer (cascade will save the cart and items)
+        customerRepository.save(customer);
 
-        // return the tracking number
         return new PurchaseResponse(orderTrackingNumber);
     }
 
     private String generateOrderTrackingNumber() {
-        // generate a random UUID (version 4)
         return UUID.randomUUID().toString();
     }
 }
