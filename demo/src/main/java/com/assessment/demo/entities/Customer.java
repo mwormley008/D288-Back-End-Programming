@@ -1,7 +1,6 @@
 package com.assessment.demo.entities;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -20,28 +19,23 @@ public class Customer {
     @Column(name = "customer_id")
     private Long id;
 
-    @NotBlank(message = "First name is mandatory")
-    @Column(name = "customer_first_name")
+    @Column(name = "customer_first_name", nullable = false)
     private String firstName;
 
-    @NotBlank(message = "Last Name is mandatory")
-    @Column(name = "customer_last_name")
+    @Column(name = "customer_last_name", nullable = false)
     private String lastName;
 
-    @NotBlank(message = "Address is mandatory")
-    @Column(name = "address")
+    @Column(name = "address", nullable = false)
     private String address;
 
-    @NotBlank(message = "Postal Code is mandatory")
-    @Column(name = "postal_code")
+    @Column(name = "postal_code", nullable = false)
     private String postal_code; // underscore to match DB + frontend DTO
 
-    @NotBlank(message = "Phone number is mandatory")
-    @Column(name = "phone")
+    @Column(name = "phone", nullable = false)
     private String phone;
 
     @CreationTimestamp
-    @Column(name = "create_date")
+    @Column(name = "create_date", updatable = false)
     private Date create_date;
 
     @UpdateTimestamp
@@ -49,10 +43,10 @@ public class Customer {
     private Date last_update;
 
     @ManyToOne
-    @JoinColumn(name = "division_id")
+    @JoinColumn(name = "division_id", nullable = false)
     private Division division;
 
-    @OneToMany(mappedBy = "customer", cascade={CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToMany(mappedBy = "customer", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private Set<Cart> carts = new HashSet<>();
 
     public void add(Cart cart) {

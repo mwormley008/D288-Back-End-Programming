@@ -47,15 +47,15 @@ public class Cart {
     private Customer customer;
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL)
-    private Set<CartItem> cartItem;
+    private Set<CartItem> cartItems; // Renamed from "cartItem"
 
-    //adds a CartItem to the Cart
+    // Adds a CartItem to the Cart
     public void add(CartItem item) {
         if (item != null) {
-            if (cartItem == null) {
-                cartItem = new HashSet<>();
+            if (cartItems == null) {
+                cartItems = new HashSet<>();
             }
-            cartItem.add(item);
+            cartItems.add(item);
             item.setCart(this);
         }
     }
