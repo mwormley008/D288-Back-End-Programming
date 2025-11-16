@@ -36,7 +36,7 @@ public class Vacation {
     private BigDecimal travelPrice;
 
     @Column(name = "image_url")
-    private String imageUrl;
+    private String image_url;
 
     @CreationTimestamp
     @Column(name = "create_date", updatable = false)
@@ -51,6 +51,6 @@ public class Vacation {
 //    private Division division;
 
     @OneToMany(mappedBy = "vacation", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
+//    @JsonIgnore
     private Set<Excursion> excursions = new HashSet<>();
 }

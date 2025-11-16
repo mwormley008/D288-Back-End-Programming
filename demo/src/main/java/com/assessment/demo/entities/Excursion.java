@@ -2,6 +2,7 @@ package com.assessment.demo.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,14 +11,14 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Objects;
 
-@Entity
-@Table(name = "excursions")
+@Data
 @Getter
 @Setter
 @NoArgsConstructor
+@Entity
+@Table(name = "excursions")
 public class Excursion {
 
     @Id
@@ -25,34 +26,38 @@ public class Excursion {
     @Column(name = "excursion_id")
     private Long id;
 
-    @Column(name = "excursion_title", nullable = false, length = 255)
-    private String excursionName;
+    @Column(name = "excursion_title", nullable = false)
+    private String excursion_title;
 
-//    @Column(name = "excursion_description", columnDefinition = "TEXT")
-//    private String excursionDescription;
+    @Column(name = "excursion_price", nullable = false, precision = 10, scale = 2)
+    private BigDecimal excursion_price;
 
     @Column(name = "image_url")
-    private String imageUrl;
-
-//    @Column(name = "unit_price", nullable = false, precision = 10, scale = 2)
-//    private BigDecimal unitPrice;
-
-//    @Column(name = "available_quantity", nullable = false)
-//    private int availableQuantity;
-
-    @ManyToOne
-    @JoinColumn(name = "vacation_id", nullable = false)
-    private Vacation vacation;
+    private String image_URL;
 
     @CreationTimestamp
     @Column(name = "create_date", updatable = false)
-    private LocalDateTime createDate;
+    private LocalDateTime create_date;
 
     @UpdateTimestamp
     @Column(name = "last_update")
-    private LocalDateTime lastUpdate;
+    private LocalDateTime last_update;
 
-//    @OneToMany(mappedBy = "excursion", cascade = CascadeType.ALL, orphanRemoval = true)
-//    @JsonIgnore
-//    private Set<CartItem> cartItems = new HashSet<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "vacation_id", nullable = false)
+    @JsonIgnore
+    private Vacation vacation;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Excursion)) return false;
+        Excursion that = (Excursion) o;
+        return Objects.equals(getId(), that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
 }

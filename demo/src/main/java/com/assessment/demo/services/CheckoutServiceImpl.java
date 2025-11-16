@@ -28,35 +28,41 @@ public class CheckoutServiceImpl implements CheckoutService {
     @Transactional
     public PurchaseResponse placeOrder(Purchase purchase) {
 
-        // Get cart items from purchase object
+        // Get cart items from the purchase object
         Set<CartItem> purchaseItems = purchase.getCartItems();
 
         // Check if cart is empty or null
         if (purchaseItems == null || purchaseItems.isEmpty()) {
-            return new PurchaseResponse("ERROR: There are no vacations in your cart. Please add at least one item before checking out.");
+            return new PurchaseResponse("ERROR: There are no excursions in your cart. Please add at least one item before checking out.");
         }
 
-        // Create a new cart instance (ignore incoming cart from Purchase)
+        // Always use the default customer with ID = 1 (frontend isn't selecting a customer)
+        Long defaultCustomerId = 1L;
+        Customer defaultCustomer = customerRepository.findById(defaultCustomerId)
+                .orElseThrow(() -> new IllegalStateException(
+                        "Customer with ID 1 not found. Make sure the sample data is loaded properly."));
+
+        // Create a new cart instance
         Cart newCart = new Cart();
         newCart.setStatus(StatusType.ordered);
-
-        // Generate tracking number
-        String orderTrackingNumber = generateOrderTrackingNumber();
-        newCart.setOrderTrackingNumber(orderTrackingNumber);
 
         // Attach items to the new cart
         for (CartItem item : purchaseItems) {
             newCart.add(item);
         }
 
-        // Associate the cart to the customer
-        Customer customer = purchase.getCustomer();
-        customer.add(newCart);
+        // Generate tracking number
+        String trackingNumber = generateOrderTrackingNumber();
+        newCart.setOrderTrackingNumber(trackingNumber);
 
-        // Save the customer (cascade will save the cart and items)
-        customerRepository.save(customer);
+        // Associate the cart with the customer
+        defaultCustomer.add(newCart);
 
-        return new PurchaseResponse(orderTrackingNumber);
+        // Save the customer (cascade saves cart and items)
+        customerRepository.save(defaultCustomer);
+
+        // Return a successful response
+        return new PurchaseResponse(trackingNumber);
     }
 
     private String generateOrderTrackingNumber() {
