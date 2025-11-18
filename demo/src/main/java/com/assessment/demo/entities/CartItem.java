@@ -6,6 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.Objects;
 
 @Data
@@ -18,12 +19,18 @@ public class CartItem {
     @Column(name = "cart_item_id")
     private Long id;
 
-    // Many cart items belong to one vacation
     @ManyToOne
-    @JoinColumn(name = "vacation_id", nullable = false)
+    @JoinColumn(name = "vacation_id")
     private Vacation vacation;
 
-    // Many cart items belong to one cart
+    @ManyToMany
+    @JoinTable(
+            name = "excursion_cartitem",
+            joinColumns = @JoinColumn(name = "cart_item_id"),
+            inverseJoinColumns = @JoinColumn(name = "excursion_id")
+    )
+    private Set<Excursion> excursions;
+
     @ManyToOne
     @JoinColumn(name = "cart_id", nullable = false)
     private Cart cart;
