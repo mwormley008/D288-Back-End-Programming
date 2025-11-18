@@ -31,22 +31,26 @@ public class CheckoutServiceImpl implements CheckoutService {
         // Get cart items from the purchase object
         Set<CartItem> purchaseItems = purchase.getCartItems();
 
-        // Check if cart is empty or null
         if (purchaseItems == null || purchaseItems.isEmpty()) {
             return new PurchaseResponse("ERROR: There are no excursions in your cart. Please add at least one item before checking out.");
         }
 
-        // Always use the default customer with ID = 1 (frontend isn't selecting a customer)
+        // Load default customer
         Long defaultCustomerId = 1L;
         Customer defaultCustomer = customerRepository.findById(defaultCustomerId)
-                .orElseThrow(() -> new IllegalStateException(
-                        "Customer with ID 1 not found. Make sure the sample data is loaded properly."));
+                .orElseThrow(() -> new IllegalStateException("Customer with ID 1 not found"));
 
-        // Create a new cart instance
+        // Create a new cart
         Cart newCart = new Cart();
         newCart.setStatus(StatusType.ordered);
 
-        // Attach items to the new cart
+        // 👇 *** FIX: copy package_price coming from Angular ***
+        if (purchase.getCart() != null) {
+            newCart.setPackage_price(purchase.getCart().getPackage_price());
+            newCart.setParty_size(purchase.getCart().getParty_size());
+        }
+
+        // Attach items to cart
         for (CartItem item : purchaseItems) {
             newCart.add(item);
         }
@@ -55,13 +59,12 @@ public class CheckoutServiceImpl implements CheckoutService {
         String trackingNumber = generateOrderTrackingNumber();
         newCart.setOrderTrackingNumber(trackingNumber);
 
-        // Associate the cart with the customer
+        // Link cart to customer
         defaultCustomer.add(newCart);
 
-        // Save the customer (cascade saves cart and items)
+        // Save everything
         customerRepository.save(defaultCustomer);
 
-        // Return a successful response
         return new PurchaseResponse(trackingNumber);
     }
 

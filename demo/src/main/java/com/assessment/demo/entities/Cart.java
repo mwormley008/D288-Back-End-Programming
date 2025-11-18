@@ -38,8 +38,8 @@ public class Cart {
     @CreationTimestamp
     private Date create_date;
 
-    @Column(name = "last_update")
     @UpdateTimestamp
+    @Column(name = "last_update")
     private Date last_update;
 
     @ManyToOne
