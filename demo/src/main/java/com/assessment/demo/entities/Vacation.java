@@ -1,24 +1,21 @@
 package com.assessment.demo.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import lombok.Data;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
-@Entity
-@Table(name = "vacations")
+@Data
 @Getter
 @Setter
-@NoArgsConstructor
+@Entity
+@Table(name = "vacations")
 public class Vacation {
 
     @Id
@@ -26,28 +23,46 @@ public class Vacation {
     @Column(name = "vacation_id")
     private Long id;
 
-    @Column(name = "vacation_title", nullable = false, length = 255)
-    private String vacationTitle;
+    @Column(name = "vacation_title")
+    private String vacation_title;
 
     @Column(name = "description")
     private String description;
 
-    @Column(name = "travel_fare_price", precision = 10, scale = 2)
-    private BigDecimal travelPrice;
+    @Column(name = "travel_fare_price")
+    @JsonProperty("travel_price")
+    private BigDecimal travel_price;
 
     @Column(name = "image_url")
-    @JsonProperty("imageUrl") // ensures JSON property matches Angular required name
-    private String imageUrl;
+    @JsonProperty("image_URL")
+    private String image_URL;
 
+    @Column(name = "create_date")
     @CreationTimestamp
-    @Column(name = "create_date", updatable = false)
-    private LocalDateTime createDate;
+    private Date create_date;
 
-    @UpdateTimestamp
     @Column(name = "last_update")
-    private LocalDateTime lastUpdate;
+    @UpdateTimestamp
+    private Date last_update;
 
-    @OneToMany(mappedBy = "vacation", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
+    @OneToMany(mappedBy = "vacation")
     private Set<Excursion> excursions = new HashSet<>();
+
+    public Vacation() {
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Vacation vacation = (Vacation) o;
+
+        return Objects.equals(id, vacation.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
+    }
 }
