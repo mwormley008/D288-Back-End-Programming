@@ -1,6 +1,7 @@
 package com.assessment.demo.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,7 +29,6 @@ public class Vacation {
     @Column(name = "vacation_title", nullable = false, length = 255)
     private String vacationTitle;
 
-
     @Column(name = "description")
     private String description;
 
@@ -36,7 +36,8 @@ public class Vacation {
     private BigDecimal travelPrice;
 
     @Column(name = "image_url")
-    private String image_url;
+    @JsonProperty("imageUrl") // ensures JSON property matches Angular required name
+    private String imageUrl;
 
     @CreationTimestamp
     @Column(name = "create_date", updatable = false)
@@ -46,11 +47,7 @@ public class Vacation {
     @Column(name = "last_update")
     private LocalDateTime lastUpdate;
 
-//    @ManyToOne
-//    @JoinColumn(name = "division_id", nullable = false)
-//    private Division division;
-
     @OneToMany(mappedBy = "vacation", cascade = CascadeType.ALL, orphanRemoval = true)
-//    @JsonIgnore
+    @JsonIgnore
     private Set<Excursion> excursions = new HashSet<>();
 }

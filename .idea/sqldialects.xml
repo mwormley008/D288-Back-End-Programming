@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SqlDialectMappings">
+    <file url="file://$PROJECT_DIR$/D288 Front End/src/resources/database/d288_create_and_populate_db_with_status_in_cart.sql" dialect="MySQL" />
+  </component>
+</project>

@@ -29,7 +29,7 @@ public class Bootstrap implements CommandLineRunner {
             Division emilyDiv = divisionRepository.findById(38L).orElse(null);
             Division arthurDiv = divisionRepository.findById(101L).orElse(null);
             Division claraDiv = divisionRepository.findById(46L).orElse(null);
-            Division milesDiv = divisionRepository.findById(101L).orElse(null);
+            Division milesDiv = divisionRepository.findById(102L).orElse(null);
 
             customerRepository.save(new Customer("John", "Baker", "715 Elm Street", "53703", "(608)555-1198", johnDiv));
             customerRepository.save(new Customer("Emily", "Lawson", "94 Oceanview Drive", "94109", "(415)555-2930", emilyDiv));
